@@ -2,6 +2,12 @@
 
 A demonstration of data pipelines in ruby, rails, activerecord and postgresql.
 
+## Demo
+
+```
+make
+```
+
 ## talk for Ruby meetup Melbourne July 2021
 
 - touch on chaining `then` to build out data transformations in ruby - [link](https://til.hashrocket.com/posts/f4agttd8si-chaining-then-in-ruby-26)
