@@ -6,6 +6,8 @@ build:
 	bundle exec rake import:stop_locations
 	bundle exec rake import:scan_data
 	bundle exec ruby app/some_stats.rb
+	# python -m pipenv install
+	python -m pipenv run jupyter notebook --notebook-dir=notebooks
 
 demo:
 	bundle exec ruby app/main.rb ${RECORD_COUNT}
