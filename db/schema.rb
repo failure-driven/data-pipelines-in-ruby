@@ -10,10 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_05_234434) do
+ActiveRecord::Schema.define(version: 2021_07_06_071701) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "scans", force: :cascade do |t|
+    t.text "mode", null: false
+    t.date "business_date", null: false
+    t.datetime "date_time", null: false
+    t.text "card_id", null: false
+    t.text "card_type", null: false
+    t.text "vehicle_id", null: false
+    t.text "parent_route"
+    t.text "route_id", null: false
+    t.bigint "stop_id", null: false
+    t.boolean "scan_on", null: false
+    t.text "source", null: false
+  end
 
   create_table "stop_locations", force: :cascade do |t|
     t.text "street", null: false

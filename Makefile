@@ -1,6 +1,13 @@
 
 build:
+	asdf install
 	bundle
+	bundle exec rake db:create db:migrate
+	bundle exec rake import:stop_locations
+	bundle exec rake import:scan_data
+	bundle exec ruby app/some_stats.rb
+
+demo:
 	bundle exec ruby app/main.rb ${RECORD_COUNT}
 
 import: import_stop_locations
