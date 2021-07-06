@@ -10,9 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 2021_07_05_234434) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "stop_locations", force: :cascade do |t|
+    t.text "street", null: false
+    t.text "location", null: false
+    t.text "stop_type"
+    t.text "suburb"
+    t.text "postcode"
+    t.text "city"
+    t.text "council"
+    t.text "areas"
+    t.decimal "latitude", precision: 10, scale: 6, default: "0.0"
+    t.decimal "longitude", precision: 10, scale: 6, default: "0.0"
+  end
 
 end
