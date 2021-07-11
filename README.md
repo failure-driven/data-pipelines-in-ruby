@@ -54,3 +54,41 @@ make
 - https://dataverse.org/
 - https://registry.opendata.aws/
 - the myki data aka https://wingarc.com.au/the-myki-privacy-breach-what-it-means-for-open-data-and-how-to-release-data-safely/
+
+## Presentation - outline
+
+* what is a data pipeline and why you want it?
+  * clean data
+  * enrich with features
+  * present as a model
+  * consume
+* what if I don't have a data pipeline?
+* CSV import to DB
+* use Active Record
+* but it can get slow
+* read all the articles
+  * 50 times faster
+* use ActiveRecord-import gem
+* surely there is something new?
+* Rails 6 brings ActiveRecord insert_all and upsert_all
+* and it's faster
+* for insert ✅
+* what about updates?
+  * insert_all does not deal with duplicates
+  * ❌
+  * fall back to using activerecord-import
+* what about edge rails?
+  * yes we can
+  * can we ??? ✅
+* how does this compare?
+  * CSV read in postgres
+  * Rust? DataFusion?
+  * Java?
+  * Scala? Apache Spark?
+* what was it about the data pipeline?
+  * ruby for clean and ingest
+  * ruby for enrich
+  * materlialized view and scenic for model
+  * insights
+  * profit $$$
+
