@@ -119,6 +119,17 @@ via https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 ```
 make nyc_data
 ```
+### Speed comparison
+
+how does that compare? smaller is better
+
+| library    | time       | relative | relative to pandas |
+| :--------- | ---------: | -------: | -----------------: |
+| ruby       |    170.2 s |    120 X |             25.0 X |
+| SQL        |     ?????? |     ???? |                    |
+| python SQL |     ?????? |     ???? |                    |
+| pandas     |     6.87 s |      5 X |              1.0 X |
+| pyarrow    |     1.45 s |      1 X |              0.2 X |
 
 ### Plain Old Ruby
 
@@ -167,16 +178,6 @@ time ruby -e 'require "CSV";
   ...
   170.21s user 114.98s system 74% cpu 6:21.43 total
 ```
-
-how does that compare?
-
-| library    | time       | relative |
-| :--------: | ---------: | -------: |
-| ruby       |   170.2 s  |    120 X |
-| SQL        |     ?????? |     ???? |
-| python SQL |     ?????? |     ???? |
-| pandas     |     6.87 s |      5 X |
-| pyarrow    |     1.45 s |      1 X |
 
 ### Python Pandas
 
