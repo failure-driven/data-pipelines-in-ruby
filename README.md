@@ -108,6 +108,76 @@ make
 
 ## Faster ways to import
 
+### Larger data set
+
+via https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+
+* https://nyc-tlc.s3.amazonaws.com/trip+data/yellow_tripdata_2020-12.csv ~ 128 MB
+* https://nyc-tlc.s3.amazonaws.com/trip+data/yellow_tripdata_2020-01.csv ~ 550 MB
+* https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2010-01.csv ~ 2.5 GB
+
+```
+make nyc_data
+```
+
+### Plain Old Ruby
+
+Line count with **wc** ~ _220ms_
+
+```
+time wc -l data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv
+
+  6405009 data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv
+  0.22s user 0.04s system 98% cpu 0.268 total
+```
+
+with **ruby** ~ _1500ms_ **7x slower**
+
+```
+time ruby -e 'data = File.read(
+    "data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv"
+  ); puts data.split("\n").count'
+
+  6405009
+  1.51s user 0.27s system 99% cpu 1.798 total
+
+# OR
+
+time ruby -e 'data = File.readlines(
+    "data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv"
+  ); puts data.count'
+
+  6405009
+  ruby -e   1.64s user 0.26s system 100% cpu 1.906 total
+```
+
+what about actually reading the CSV
+
+```
+time ruby -e 'require "CSV";
+  data = CSV.read(
+    "data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv",
+    headers: true, row_sep: :auto
+  );
+  pp data.first(2);
+  puts "\n..\n\n";
+  pp data.last(2); # ERROR ???
+  puts "\n#{data.count}"'
+
+  ...
+  170.21s user 114.98s system 74% cpu 6:21.43 total
+```
+
+how does that compare?
+
+| library    | time       | relative |
+| :--------: | ---------: | -------: |
+| ruby       |   170.2 s  |    120 X |
+| SQL        |     ?????? |     ???? |
+| python SQL |     ?????? |     ???? |
+| pandas     |     6.87 s |      5 X |
+| pyarrow    |     1.45 s |      1 X |
+
 ### Python Pandas
 
 seems reading a CSV is faster than connecting to the DB :) why even store data
@@ -190,12 +260,3 @@ time psql ruby_pipeline_demo_development -c \
   COPY 27614
   0.03s user 0.08s system 64% cpu 0.178 total
 ```
-
-### Larger data set
-
-via https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
-
-* https://nyc-tlc.s3.amazonaws.com/trip+data/yellow_tripdata_2020-12.csv ~ 128 MB
-* https://nyc-tlc.s3.amazonaws.com/trip+data/yellow_tripdata_2020-01.csv ~ 550 MB
-* https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2010-01.csv ~ 2.5 GB
-

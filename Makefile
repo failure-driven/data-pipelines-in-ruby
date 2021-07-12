@@ -16,6 +16,12 @@ conda_notebook:
 	pipenv --python=$(conda run which python) --site-packages
 	jupyter notebook --notebook-dir=notebooks
 
+data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv:
+	curl https://nyc-tlc.s3.amazonaws.com/trip+data/yellow_tripdata_2020-01.csv \
+			--output data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv
+
+nyc_data: data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv
+
 demo:
 	bundle exec ruby app/main.rb ${RECORD_COUNT}
 
