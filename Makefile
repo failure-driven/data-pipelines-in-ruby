@@ -9,6 +9,13 @@ build:
 	python -m pip install --user pipenv
 	python -m pipenv run jupyter notebook --notebook-dir=notebooks
 
+conda_notebook:
+	conda install pipenv pandas psycopg2 matplotlib pyarrow
+	# conda install -c conda-forge pyarrow
+	# conda install -c conda-forge pipenv
+	pipenv --python=$(conda run which python) --site-packages
+	jupyter notebook --notebook-dir=notebooks
+
 demo:
 	bundle exec ruby app/main.rb ${RECORD_COUNT}
 

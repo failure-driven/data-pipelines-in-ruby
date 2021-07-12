@@ -92,3 +92,110 @@ make
   * insights
   * profit $$$
 
+* background on faster ways
+  * ["Apache Arrow and the Future of Data Frames" with Wes McKinney](https://www.youtube.com/watch?v=fyj4FyH3XdU)
+    - Data frames for time series and procedural processing where SQL does not fair as well, stateful
+    - Arrow vs Pandas speed
+      - Demo vldb-2019-apache-arrow-workshop
+      - Demo NYTC Taxi
+        - import pyarrow.csv as csv
+        csv.read_csv("yellow_tripdata_2010-01.csv") 1.47 sec
+        %%time
+        vs pd.read_csv("") single threaded 30 sec
+    - Julia article
+      - https://towardsdatascience.com/the-great-csv-showdown-julia-vs-python-vs-r-aa77376fb96
+    - direct using COPY and pandas equiv https://stackoverflow.com/questions/2987433/how-to-import-csv-file-data-into-a-postgresql-table
+
+## Faster ways to import
+
+### Python Pandas
+
+seems reading a CSV is faster than connecting to the DB :) why even store data
+in a relational DB?
+
+### Apache Arrow
+
+> "Apache Arrow defines a language-indepependent columnar memory format for flat
+> and hierarchical data"
+
+https://arrow.apache.org/
+
+Optimised for multi CPU and GPU hardware.
+
+used in things like https://rapids.ai/ (Nvidia Cuda GPU accelerated AI library)
+
+#### pyarrow (Python)
+
+to install PyArrow on Mac M1 silicon
+
+- following https://uwekorn.com/2021/01/11/apache-arrow-on-the-apple-m1.html
+- download from https://github.com/conda-forge/miniforge/blob/master/README.md
+- `bash ~/Downloads/Miniforge3-MacOSX-arm64.sh`
+- `conda install -c conda-forge pyarrow`
+
+and
+
+```
+make conda_notebook
+```
+
+TODO: make script to download, install and use pipenv?
+
+#### DataFusion (Rust)
+
+https://github.com/apache/arrow-datafusion
+
+??? what about reading CSV in Rust directly?
+
+#### red-arrow (Ruby gem)
+
+could attempt to write a big file in arrow format and read it? would it be faster
+https://github.com/apache/arrow/tree/master/ruby/red-arrow
+
+```{ruby}
+require "arrow"
+
+table = Arrow::Table.load("/dev/shm/data.arrow")
+# Process data in table
+table.save("/dev/shm/data-processed.arrow")
+```
+
+### direct CSV to and from Postgres
+
+```
+# record count
+psql ruby_pipeline_demo_development \
+  -c "SELECT COUNT(*) FROM stop_locations;"
+
+   count
+  -------
+   27614
+  (1 row)
+
+# export to CSV file
+time psql ruby_pipeline_demo_development \
+  -c "COPY stop_locations TO '`pwd`/stop_locations.csv' CSV HEADER;"
+
+  COPY 27614
+
+  0.03s user 0.08s system 83% cpu 0.137 total
+
+# delete records in table
+psql ruby_pipeline_demo_development -c "truncate stop_locations;"
+
+# import from CSV
+time psql ruby_pipeline_demo_development -c \
+  "COPY stop_locations FROM '`pwd`/stop_locations.csv' DELIMITER ',' CSV HEADER;"
+
+  COPY 27614
+  0.03s user 0.08s system 64% cpu 0.178 total
+```
+
+### Larger data set
+
+via https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+
+* https://nyc-tlc.s3.amazonaws.com/trip+data/yellow_tripdata_2020-12.csv ~ 128 MB
+* https://nyc-tlc.s3.amazonaws.com/trip+data/yellow_tripdata_2020-01.csv ~ 550 MB
+* https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2010-01.csv ~ 2.5 GB
+
