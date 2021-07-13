@@ -125,9 +125,9 @@ how does that compare? smaller is better
 
 | library    | time       | relative | relative to pandas |
 | :--------- | ---------: | -------: | -----------------: |
-| ruby       |    170.2 s |    120 X |             25.0 X |
-| SQL        |     ?????? |     ???? |                    |
-| python SQL |     ?????? |     ???? |                    |
+| ruby       |   170.21 s |    120 X |             25.0 X |
+| python SQL |    38.80 s |     27 X |              7.0 X |
+| SQL COPY   |    21.97 s |     15 X |              3.0 X |
 | pandas     |     6.87 s |      5 X |              1.0 X |
 | pyarrow    |     1.45 s |      1 X |              0.2 X |
 
@@ -142,7 +142,7 @@ time wc -l data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv
   0.22s user 0.04s system 98% cpu 0.268 total
 ```
 
-with **ruby** ~ _1500ms_ **7x slower**
+with **ruby** ~ _1500ms_ **7 X slower**
 
 ```
 time ruby -e 'data = File.read(
@@ -162,7 +162,7 @@ time ruby -e 'data = File.readlines(
   ruby -e   1.64s user 0.26s system 100% cpu 1.906 total
 ```
 
-what about actually reading the CSV
+what about actually reading the CSV ~ _170,210ms_ **800 X slower**
 
 ```
 time ruby -e 'require "CSV";
@@ -232,6 +232,45 @@ table.save("/dev/shm/data-processed.arrow")
 ```
 
 ### direct CSV to and from Postgres
+
+import CSV into Postgres directly with **SQL COPY** ~ _21,973ms_
+
+```
+time psql ruby_pipeline_demo_development -c "COPY yellow_tripdata(
+    VendorID,tpep_pickup_datetime,tpep_dropoff_datetime,passenger_count,
+    trip_distance,RatecodeID,store_and_fwd_flag,PULocationID,DOLocationID,
+    payment_type,fare_amount,extra,mta_tax,tip_amount,tolls_amount,
+    improvement_surcharge,total_amount,congestion_surcharge
+  ) FROM
+  '`pwd`/data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv'
+  DELIMITER ',' CSV HEADER;"
+
+  COPY 6405008
+  0.03s user 0.09s system 0% cpu 21.973 total
+
+psql ruby_pipeline_demo_development -c "(
+    SELECT * FROM yellow_tripdata LIMIT 2
+  ) UNION (
+    SELECT * FROM yellow_tripdata ORDER BY id DESC LIMIT 2
+  ) ORDER BY id"
+
+psql ruby_pipeline_demo_development -c "SELECT COUNT(*) FROM yellow_tripdata"
+
+    count
+  ---------
+   6405008
+  (1 row)
+
+# reset
+
+psql ruby_pipeline_demo_development -c "TRUNCATE yellow_tripdata"
+TRUNCATE TABLE
+
+psql ruby_pipeline_demo_development -c "ALTER SEQUENCE yellow_tripdata_id_seq RESTART WITH 1"
+ALTER SEQUENCE
+```
+
+with stop_locations
 
 ```
 # record count

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_06_071701) do
+ActiveRecord::Schema.define(version: 2021_07_13_032225) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,6 +40,27 @@ ActiveRecord::Schema.define(version: 2021_07_06_071701) do
     t.text "areas"
     t.decimal "latitude", precision: 10, scale: 6, default: "0.0"
     t.decimal "longitude", precision: 10, scale: 6, default: "0.0"
+  end
+
+  create_table "yellow_tripdata", force: :cascade do |t|
+    t.integer "vendorid"
+    t.datetime "tpep_pickup_datetime"
+    t.datetime "tpep_dropoff_datetime"
+    t.integer "passenger_count"
+    t.float "trip_distance"
+    t.text "ratecodeid"
+    t.text "store_and_fwd_flag"
+    t.integer "pulocationid"
+    t.integer "dolocationid"
+    t.float "payment_type"
+    t.float "fare_amount"
+    t.float "extra"
+    t.float "mta_tax"
+    t.float "tip_amount"
+    t.float "tolls_amount"
+    t.float "improvement_surcharge"
+    t.float "total_amount"
+    t.float "congestion_surcharge"
   end
 
 end
