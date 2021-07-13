@@ -55,6 +55,13 @@ make
 - https://registry.opendata.aws/
 - the myki data aka https://wingarc.com.au/the-myki-privacy-breach-what-it-means-for-open-data-and-how-to-release-data-safely/
 
+**SHORTLIST**
+
+- http://insideairbnb.com/get-the-data.html
+- MYKI
+  - [Guardian - Myki data release breached privacy laws and revealed travel histories, including of Victorian MP](https://www.theguardian.com/australia-news/2019/aug/15/myki-data-release-breached-privacy-laws-and-revealed-travel-histories-including-of-victorian-mp)
+  - [Stop the Open Data Bus, We Want to Get Of](https://arxiv.org/pdf/1908.05004.pdf)
+
 ## Presentation - outline
 
 * what is a data pipeline and why you want it?
@@ -106,6 +113,12 @@ make
       - https://towardsdatascience.com/the-great-csv-showdown-julia-vs-python-vs-r-aa77376fb96
     - direct using COPY and pandas equiv https://stackoverflow.com/questions/2987433/how-to-import-csv-file-data-into-a-postgresql-table
 
+  - [InfluxDB IOx Tech Talks: Query Engine Design and the Rust-Based DataFusion in Apache Arrow](https://www.youtube.com/watch?v=K6eCAVEk4kU)
+  - [Data Analysis in Ruby](https://medium.com/@mary.e.beliveau/data-analysis-in-ruby-729ada505db1)
+  - [github SciRuby/daru](https://github.com/SciRuby/daru)
+    - [Daru: Pandas for Ruby](https://ankane.org/daru)
+  - [github mrkn/pandas.rb](https://github.com/mrkn/pandas.rb)
+
 ## Faster ways to import
 
 ### Larger data set
@@ -119,6 +132,7 @@ via https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 ```
 make nyc_data
 ```
+
 ### Speed comparison
 
 how does that compare? smaller is better
@@ -215,6 +229,8 @@ TODO: make script to download, install and use pipenv?
 #### DataFusion (Rust)
 
 https://github.com/apache/arrow-datafusion
+
+https://docs.rs/datafusion/4.0.0/datafusion/
 
 ??? what about reading CSV in Rust directly?
 
