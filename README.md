@@ -26,7 +26,7 @@ make
     ```
     # Rails Edge
     upsert_all(attributes, on_duplicate: :update, returning: nil, unique_by: nil)
-    
+
     # Rails 6.1
     upsert_all(attributes, returning: nil, unique_by: nil)
     ```
@@ -137,13 +137,15 @@ make nyc_data
 
 how does that compare? smaller is better
 
-| library    | time       | relative | relative to pandas |
-| :--------- | ---------: | -------: | -----------------: |
-| ruby       |   170.21 s |    120 X |             25.0 X |
-| python SQL |    38.80 s |     27 X |              7.0 X |
-| SQL COPY   |    21.97 s |     15 X |              3.0 X |
-| pandas     |     6.87 s |      5 X |              1.0 X |
-| pyarrow    |     1.45 s |      1 X |              0.2 X |
+| library        | time       | relative   | relative to pandas |
+| :------------- | ---------: | ---------: | -----------------: |
+| ruby CSV       |   170.21 s |    120   X |             25.0 X |
+| python SQL     |    38.80 s |     27   X |              7.0 X |
+| ruby Rcsv      |    27.64 s |     19   X |              4.0 X |
+| SQL COPY       |    21.97 s |     15   X |              3.0 X |
+| pandas         |     6.87 s |      5   X |              1.0 X |
+| ruby red-arrow |     2.28 s |      1.6 X |              0.3 X |
+| pyarrow        |     1.45 s |      1   X |              0.2 X |
 
 ### Plain Old Ruby
 
@@ -191,6 +193,39 @@ time ruby -e 'require "CSV";
 
   ...
   170.21s user 114.98s system 74% cpu 6:21.43 total
+```
+
+* why not FasterCSV? (as it's already in ruby 1.9 and above)
+
+```
+time ruby -e 'require "fastercsv"; FasterCSV.read()'
+/Users/michael/.asdf/installs/ruby/3.0.1/lib/ruby/gems/3.0.0/gems/fastercsv-1.5.5/lib/faster_csv.rb:13:in `const_missing':
+Please switch to Ruby 1.9's standard CSV library.
+It's FasterCSV plus support for Ruby 1.9's m17n encoding engine. (NotImplementedError)
+```
+
+* RCSV - https://github.com/fiksu/rcsv
+
+```
+time ruby -e 'require "rcsv";
+  line_count = 0;
+  Rcsv.parse(
+    File.open("data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv"),
+    buffer_size: 20 * 1024 * 1024
+  ).each_with_index do |row, index|
+    pp row if index < 2
+    line_count += 1
+  end
+  pp line_count'
+
+  ...
+  27.64s user 17.49s system 77% cpu 58.563 total
+```
+
+* red-arrow
+
+```
+make demo_ruby_arrow
 ```
 
 ### Python Pandas
@@ -316,3 +351,22 @@ time psql ruby_pipeline_demo_development -c \
   COPY 27614
   0.03s user 0.08s system 64% cpu 0.178 total
 ```
+
+## Choice of presentation software
+
+just because I love new presentation softare.
+
+My last favourite was MDX-deck so judging by it's competitors on
+
+https://progsoft.net/en/software/mdx-deck
+
+my shortlist is anything somewhat popular using markdow
+
+- https://marp.app/
+- https://ludus.one/
+- https://github.com/regebro/hovercraft - first choice if a prezi like
+  presentation makes sense
+  - https://regebro.github.io/hovercraft/#/step-1
+- https://github.com/gitpitch/gitpitch - seems to have shut down
+  - https://www.youtube.com/watch?v=MT88pCE291I
+
