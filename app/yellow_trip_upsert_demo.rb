@@ -34,13 +34,13 @@ headers = CSV.parse(
 csv_records = Rcsv.parse(
   File
     .open("data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv")
-    .each_line.lazy.first(record_limit).join("\n"),
+    .each_line.lazy.first(record_limit).join("\n")
 )
 
 YellowTripDatum.delete_all
 raise "yellow trip not empty" unless YellowTripDatum.count.zero?
 
-records = csv_records.map{|csv_record| headers.zip(csv_record).to_h }
+records = csv_records.map { |csv_record| headers.zip(csv_record).to_h }
 YellowTripDatum.insert_all(records)
 
 raise "yellow trip not all loaded #{YellowTripDatum.count}" unless YellowTripDatum.count == record_limit - 1
@@ -64,35 +64,40 @@ Benchmark.bm(20) do |x|
       .map do |yellow_trip_datum|
         yellow_trip_datum.update(trip_distance: 666.66)
       end
-    raise "yellow trip not all updated #{YellowTripDatum.count}" unless YellowTripDatum.where(trip_distance: 666.66).count == record_limit - 1
+    unless YellowTripDatum.where(trip_distance: 666.66).count == record_limit - 1
+      raise "yellow trip not all updated #{YellowTripDatum.count}"
+    end
   end
 
   x.report(format("%20s", "UPDATE AR IMPORT")) do
     raise "yellow trip not reset" unless YellowTripDatum.where(trip_distance: 777.77).count.zero?
 
-    records = YellowTripDatum.pluck(:id, :trip_distance).map{|id, _trip_distance| [id, 777.77] }
+    records = YellowTripDatum.pluck(:id, :trip_distance).map { |id, _trip_distance| [id, 777.77] }
     YellowTripDatum.import(
-      [:id, :trip_distance],
+      %i[id trip_distance],
       records,
-      on_duplicate_key_update: [
-        :id,
-        :trip_distance
+      on_duplicate_key_update: %i[
+        id
+        trip_distance
       ]
     )
 
-    raise "yellow trip not all updated #{YellowTripDatum.count}" unless YellowTripDatum.where(trip_distance: 777.77).count == record_limit - 1
+    unless YellowTripDatum.where(trip_distance: 777.77).count == record_limit - 1
+      raise "yellow trip not all updated #{YellowTripDatum.count}"
+    end
   end
 
   x.report(format("%20s", "UPDATE AR UPSERT_ALL")) do
     raise "yellow trip not reset" unless YellowTripDatum.where(trip_distance: 888.88).count.zero?
 
-    rows = YellowTripDatum.pluck(:id, :trip_distance).map{|id, _trip_distance| [id, 888.88] }
-    records = rows.map{|row| [:id, :trip_distance].zip(row).to_h }
-   #YellowTripDatum.upsert_all(
-   #  records,
-   #  on_duplicate: :update
-   #)
+    rows = YellowTripDatum.pluck(:id, :trip_distance).map { |id, _trip_distance| [id, 888.88] }
+    records = rows.map { |row| %i[id trip_distance].zip(row).to_h }
+    # YellowTripDatum.upsert_all(
+    #  records,
+    #  on_duplicate: :update
+    # )
 
-   #raise "yellow trip not all updated #{YellowTripDatum.count}" unless YellowTripDatum.where(trip_distance: 888.88).count == record_limit - 1
+    # all_records_updated = YellowTripDatum.where(trip_distance: 888.88).count == record_limit - 1
+    # raise "yellow trip not all updated #{YellowTripDatum.count}" unless all_records_updated
   end
 end

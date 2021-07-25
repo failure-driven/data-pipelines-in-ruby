@@ -23,6 +23,7 @@ namespace :import do
     Dir["data/myki/full_samp_0_and_1/**/*.txt.gz"]
       .map do |filename|
         next unless Scan.where(source: filename[%r{[^/]+.txt.gz}]).count.zero?
+
         Scan
           .read_file_in_batches(filename)
           .map { Scan.enrich_scan_and_source(filename, _1) }

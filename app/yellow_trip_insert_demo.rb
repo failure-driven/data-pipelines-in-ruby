@@ -34,7 +34,7 @@ headers = CSV.parse(
 csv_records = Rcsv.parse(
   File
     .open("data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv")
-    .each_line.lazy.first(record_limit).join("\n"),
+    .each_line.lazy.first(record_limit).join("\n")
 )
 
 # make insert_demo RECORD_COUNT=100_000
@@ -70,7 +70,7 @@ Benchmark.bm(20) do |x|
   x.report(format("%20s", "COPY AR INSERT_ALL")) do
     raise "yellow trip not empty" unless YellowTripDatum.count.zero?
 
-    records = csv_records.map{|csv_record| headers.zip(csv_record).to_h }
+    records = csv_records.map { |csv_record| headers.zip(csv_record).to_h }
     YellowTripDatum.insert_all(records)
 
     raise "yellow trip not all loaded #{YellowTripDatum.count}" unless YellowTripDatum.count == record_limit - 1
