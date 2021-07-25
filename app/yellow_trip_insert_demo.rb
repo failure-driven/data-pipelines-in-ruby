@@ -37,15 +37,12 @@ csv_records = Rcsv.parse(
     .each_line.lazy.first(record_limit).join("\n"),
 )
 
-# puts "running test on #{record_limit} records"
-
-# make
-#   bundle exec ruby app/main.rb ${RECORD_COUNT}
-#
-# user     system      total        real
-# COPY AR ONE BY ONE   5.897386   0.533079   6.430465 (  8.858250)
-#     COPY AR IMPORT   1.716771   0.013001   1.729772 (  2.236956)
-# COPY AR INSERT_ALL   1.282491   0.005851   1.288342 (  1.565381)
+# make insert_demo RECORD_COUNT=100_000
+# bundle exec ruby app/yellow_trip_insert_demo.rb 100_000
+#                            user     system      total        real
+#   COPY AR ONE BY ONE  88.954556   9.500534  98.455090 (179.043694)
+#       COPY AR IMPORT   7.695401   0.071555   7.766956 (  9.731619)
+#   COPY AR INSERT_ALL   5.621505   0.141534   5.763039 (  7.887981)
 
 Benchmark.bm(20) do |x|
   YellowTripDatum.delete_all
@@ -64,7 +61,6 @@ Benchmark.bm(20) do |x|
   x.report(format("%20s", "COPY AR IMPORT")) do
     raise "yellow trip not empty" unless YellowTripDatum.count.zero?
 
-    #record = csv_records.map{|csv_record| headers.zip(csv_record).to_h }
     YellowTripDatum.import(headers, csv_records)
 
     raise "yellow trip not all loaded #{YellowTripDatum.count}" unless YellowTripDatum.count == record_limit - 1
@@ -79,24 +75,4 @@ Benchmark.bm(20) do |x|
 
     raise "yellow trip not all loaded #{YellowTripDatum.count}" unless YellowTripDatum.count == record_limit - 1
   end
-
- # StopLocation.delete_all
- # x.report(format("%20s", "COPY AR IMPORT")) do
- #   raise "locations not empty" unless StopLocation.count.zero?
-
- #   StopLocation
- #     .read_file_in_batches("data/myki/stop_locations.txt.gz")
- #     .then { StopLocation.ar_import(_1) }
- #   raise "locations not all loaded" unless StopLocation.count == 27_614
- # end
-
- # StopLocation.delete_all
- # x.report(format("%20s", "COPY AR INSERT_ALL")) do
- #   raise "locations not empty" unless StopLocation.count.zero?
-
- #   StopLocation
- #     .read_file_in_batches("data/myki/stop_locations.txt.gz")
- #     .then { StopLocation.ar_insert_all(_1) }
- #   raise "locations not all loaded" unless StopLocation.count == 27_614
- # end
 end

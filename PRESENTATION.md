@@ -46,7 +46,7 @@ Black Box Co
 
 ----
 
-:id: wide-title-slide
+:id: wide-title-slide-2
 
 Data Pipelines in Ruby
 ======================
@@ -373,51 +373,65 @@ Insert SQL
 ActiveRecord
 ============
 
-.. ::code ruby
-  CSV.read("filename.csv", headers: true)
-    .each do |record|
-      Datum.create(record)
-    end
+.. code:: ruby
+
+    csv_records
+      .map do |values|
+        record = headers.zip(values).to_h
+        YellowTripDatum.create(record)
+      end
 
 .. class:: substep
 
-X.XXs for 560Mb
+179.0s for 100_000 records
 
 ----
 
 ActiveRecord-import
 ===================
 
-.. ::code ruby
-  require "activerecord-import"
+.. code:: ruby
 
-  FIELDS = %w[id field_1 field_2]
+    require "activerecord-import"
 
-  CSV.read("filename.csv", headers: true)
-    .each_slice(1_000) do |batch|
-      Datum.import(FIELDS, batch)
-    end
+    headers = [:id, :trip_distance, ...]
+
+    YellowTripDatum.import(headers, csv_records)
 
 .. class:: substep
 
-X.XXs for 560Mb
+9.73s for 100_000 records
 
 ----
 
 ActiveRecord insert_all
 =======================
 
-.. ::code ruby
-  FIELDS = %w[id field_1 field_2]
+.. code:: ruby
 
-  CSV.read("filename.csv", headers: true)
-    .each_slice(1_000) do |batch|
-      Datum.insert_all(FIELDS, batch)
-    end
+    headers = [:id, :trip_distance, ...]
+
+    records = csv_records
+      .map{|csv_record| headers.zip(csv_record).to_h }
+    YellowTripDatum.insert_all(records)
 
 .. class:: substep
 
-X.XXs for 560Mb
+7.88s for 100_000 records
+
+----
+
+Insert/Upsert AR
+================
+
+.. code:: markdown
+
+    | Method          | time       |
+    | :------------   | ---------: |
+    | Create          |            |
+    |   AR one-by-one |    91.37 s |
+    |   insert        |     9.73 s |
+    |   AR insert_all |     7.88 s |
 
 ----
 
@@ -429,63 +443,89 @@ Update SQL
 ActiveRecord
 ============
 
-.. ::code ruby
-    Datum.update(record)
+.. code:: ruby
+
+    YellowTripDatum
+      .all
+      .map do |yellow_trip_datum|
+        yellow_trip_datum.update(trip_distance: 666.66)
+      end
 
 .. class:: substep
 
-X.XXs for 560Mb
+91.4s for 100_000 records
 
 ----
 
 ActiveRecord-import
 ===================
 
-.. ::code ruby
+.. code:: ruby
+
     require "activerecord-import"
 
-    Datum.import(
-      %w[id field_1 field_2],
-      [
-        [1, "field_a", "field_b"],
-        [1, "field_a", "field_b"],
-      ],
+    records = YellowTripDatum
+      .pluck(:id, :trip_distance)
+      .map{|id, _trip_distance| [id, 777.77] }
+
+    YellowTripDatum.import(
+      [:id, :trip_distance],
+      records,
       on_duplicate_key_update: [
         :id,
-        :field_1,
-        :field_2
+        :trip_distance
       ]
     )
 
 .. class:: substep
 
-X.XXs for 560Mb
+3.43s for 100_000 records
 
 ----
 
 ActiveRecord upsert_all
 =======================
 
-_needs edge rails_
+*needs edge rails*
 
-https://github.com/rails/rails/blob/1488cb84400cdee781d39707dc65e44d348eeaa8/activerecord/lib/active_record/insert_all.rb#L6
+.. code:: ruby
 
-.. ::code ruby
-    Datum.upsert_all(
-      [
-        { id: 1, field_1: "field_a", field_2: "feild_b" },
-        { id: 2, field_1: "field_a", field_2: "feild_b" }
-      ],
-      on_duplicate:
+    rows = YellowTripDatum
+      .pluck(:id, :trip_distance)
+      .map{|id, _trip_distance| [id, 888.88] }
+
+    records = rows
+      .map{|row| [:id, :trip_distance].zip(row).to_h }
+    YellowTripDatum.upsert_all(
+      records,
+      on_duplicate: :update
     )
 
 .. class:: substep
 
-X.XXs for 560Mb
+2.06s for 100_000 records
 
 ----
 
-:id: wide-title-slide
+Insert/Upsert AR
+================
+
+.. code:: markdown
+
+    | Method          | time       | relative   |
+    | :------------   | ---------: | ---------: |
+    | Create          |            |            |
+    |   AR one-by-one |    91.37 s |            |
+    |   insert        |     9.73 s |            |
+    |   AR insert_all |     7.88 s |            |
+    | Update          |            |            |
+    |   AR one-by-one |   179.04 s |            |
+    |   update        |     3.43 s |            |
+    |   AR upsert_all |     2.06 s |            |
+
+----
+
+:id: wide-title-slide-1
 
 Data Pipelines in Ruby
 ======================
@@ -499,6 +539,8 @@ Data Pipelines in Ruby
 * RCSV for csv
 
 * insert_all/upsert_all Rails 6
+
+* worth benchmarking
 
 Thank You
 =========

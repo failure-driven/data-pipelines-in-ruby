@@ -21,14 +21,16 @@ body::after {
 div.step {
   font-size: 40px;
   width: 1000px;
-  overflow: scroll;
 }
 
 #start-slide {
   width: 1200px;
 }
 
-#wide-title-slide {
+#wide-title-slide-1 {
+  width: 1200px;
+}
+#wide-title-slide-2 {
   width: 1200px;
 }
 
