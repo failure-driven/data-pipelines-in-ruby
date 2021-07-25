@@ -55,9 +55,11 @@ Data Pipelines in Ruby
 
 * What is a data pipeline?
 
-* Ruby CSV porcessing
-
 * Is Ruby fast enough?
+
+* Ruby reading CSV
+
+* ActiveRecord insert/update
 
 ----
 
@@ -181,7 +183,7 @@ Read CSV
     puts "\n..\n\n"
     pp data.last(2)
     puts "\n#{data.count}"
-  
+
 .. class:: substep
 
 170s for 560Mb
@@ -200,7 +202,7 @@ SQL Copy
     DELIMITER ',' CSV HEADER;
 
     COPY 6405008
-  
+
 .. class:: substep
 
 22s for 560Mb
@@ -363,10 +365,140 @@ Read CSV
 
 ----
 
-Write to SQL
-============
+Insert SQL
+==========
 
 ----
+
+ActiveRecord
+============
+
+.. ::code ruby
+  CSV.read("filename.csv", headers: true)
+    .each do |record|
+      Datum.create(record)
+    end
+
+.. class:: substep
+
+X.XXs for 560Mb
+
+----
+
+ActiveRecord-import
+===================
+
+.. ::code ruby
+  require "activerecord-import"
+
+  FIELDS = %w[id field_1 field_2]
+
+  CSV.read("filename.csv", headers: true)
+    .each_slice(1_000) do |batch|
+      Datum.import(FIELDS, batch)
+    end
+
+.. class:: substep
+
+X.XXs for 560Mb
+
+----
+
+ActiveRecord insert_all
+=======================
+
+.. ::code ruby
+  FIELDS = %w[id field_1 field_2]
+
+  CSV.read("filename.csv", headers: true)
+    .each_slice(1_000) do |batch|
+      Datum.insert_all(FIELDS, batch)
+    end
+
+.. class:: substep
+
+X.XXs for 560Mb
+
+----
+
+Update SQL
+==========
+
+----
+
+ActiveRecord
+============
+
+.. ::code ruby
+    Datum.update(record)
+
+.. class:: substep
+
+X.XXs for 560Mb
+
+----
+
+ActiveRecord-import
+===================
+
+.. ::code ruby
+    require "activerecord-import"
+
+    Datum.import(
+      %w[id field_1 field_2],
+      [
+        [1, "field_a", "field_b"],
+        [1, "field_a", "field_b"],
+      ],
+      on_duplicate_key_update: [
+        :id,
+        :field_1,
+        :field_2
+      ]
+    )
+
+.. class:: substep
+
+X.XXs for 560Mb
+
+----
+
+ActiveRecord upsert_all
+=======================
+
+_needs edge rails_
+
+https://github.com/rails/rails/blob/1488cb84400cdee781d39707dc65e44d348eeaa8/activerecord/lib/active_record/insert_all.rb#L6
+
+.. ::code ruby
+    Datum.upsert_all(
+      [
+        { id: 1, field_1: "field_a", field_2: "feild_b" },
+        { id: 2, field_1: "field_a", field_2: "feild_b" }
+      ],
+      on_duplicate:
+    )
+
+.. class:: substep
+
+X.XXs for 560Mb
+
+----
+
+:id: wide-title-slide
+
+Data Pipelines in Ruby
+======================
+
+.. class:: substep
+
+* Your mileage may vary
+
+* certain scale w Ruby
+
+* RCSV for csv
+
+* insert_all/upsert_all Rails 6
 
 Thank You
 =========

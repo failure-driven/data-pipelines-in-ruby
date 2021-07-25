@@ -1,6 +1,6 @@
-class CreateYellowTripdata < ActiveRecord::Migration[6.0]
+class CreateYellowTripData < ActiveRecord::Migration[6.0]
   def change
-    create_table :yellow_tripdata do |t|
+    create_table :yellow_trip_data do |t|
       t.integer :vendorid
       t.datetime :tpep_pickup_datetime
       t.datetime :tpep_dropoff_datetime

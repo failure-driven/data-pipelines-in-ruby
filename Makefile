@@ -28,7 +28,13 @@ data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv:
 
 nyc_data: data/nyc_yellow_tripdata/yellow_tripdata_2020-01.csv
 
-demo:
+insert_demo:
+	bundle exec ruby app/yellow_trip_insert_demo.rb ${RECORD_COUNT}
+
+upsert_demo:
+	bundle exec ruby app/yellow_trip_upsert_demo.rb ${RECORD_COUNT}
+
+old_demo:
 	bundle exec ruby app/main.rb ${RECORD_COUNT}
 
 import: import_stop_locations

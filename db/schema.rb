@@ -42,7 +42,7 @@ ActiveRecord::Schema.define(version: 2021_07_13_032225) do
     t.decimal "longitude", precision: 10, scale: 6, default: "0.0"
   end
 
-  create_table "yellow_tripdata", force: :cascade do |t|
+  create_table "yellow_trip_data", force: :cascade do |t|
     t.integer "vendorid"
     t.datetime "tpep_pickup_datetime"
     t.datetime "tpep_dropoff_datetime"
