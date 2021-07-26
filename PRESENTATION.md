@@ -70,14 +70,20 @@ Data Pipeline?
 
 ----
 
-ML Pipeline?
-============
+Data Pipeline?
+==============
 
-* Data collection
-* Data cleaning
-* Feature extraction
-* Model validation
-* Visualisation
+.. code::
+
+  Data(CSV)
+
+  -> clean data (SQL)
+
+  -> add features (SQL)
+
+  -> create model
+
+  -> publish/visualise
 
 ----
 
@@ -147,6 +153,8 @@ why are pipelines good?
 
     * horizontally scalable
 
+    * make it idempotent
+
 ----
 
 Data pipeline
@@ -155,9 +163,13 @@ Data pipeline
 .. code::
 
   Data(CSV)
+
   -> clean data
+
   -> add features
+
   -> create model
+
   -> publish/visualise
 
 ----
@@ -387,6 +399,46 @@ ActiveRecord
 
 ----
 
+Can we go faster?
+=================
+
+----
+
+:data-transition-duration: 1000
+:data-y: r1000
+
+.. image:: images/blog_adventures_in_code_grab_data_faster.png
+    :width: 800px
+
+----
+
+:data-transition-duration: 1000
+:data-rotate: 90
+
+.. image:: images/blog_daftcode_faster_ruby_import.png
+    :width: 800px
+
+----
+
+:data-transition-duration: 1000
+:id: ThreeD
+:data-y: r820
+:data-rotate-x: 180
+
+.. image:: images/blog_mutually_human_faster.png
+    :width: 800px
+
+----
+
+
+:data-transition-duration: 1000
+:data-rotate: -90
+
+.. image:: images/blog_naturality_50_times_faster.png
+    :width: 800px
+
+----
+
 ActiveRecord-import
 ===================
 
@@ -430,8 +482,25 @@ Insert/Upsert AR
     | :------------   | ---------: |
     | Create          |            |
     |   AR one-by-one |    91.37 s |
-    |   insert        |     9.73 s |
+    |   AR import     |     9.73 s |
     |   AR insert_all |     7.88 s |
+
+----
+
+Data Pipeline
+=============
+
+.. code::
+
+  Data(CSV)
+
+  -> clean data (SQL)
+
+  -> add features (SQL)
+
+  -> create model
+
+  -> publish/visualise
 
 ----
 
@@ -512,16 +581,16 @@ Insert/Upsert AR
 
 .. code:: markdown
 
-    | Method          | time       | relative   |
-    | :------------   | ---------: | ---------: |
-    | Create          |            |            |
-    |   AR one-by-one |    91.37 s |            |
-    |   insert        |     9.73 s |            |
-    |   AR insert_all |     7.88 s |            |
-    | Update          |            |            |
-    |   AR one-by-one |   179.04 s |            |
-    |   update        |     3.43 s |            |
-    |   AR upsert_all |     2.06 s |            |
+    | Method          | time       | relative |
+    | :------------   | ---------: | -------: |
+    | Create          |            |          |
+    |   AR one-by-one |    91.37 s |  11.6 X  |
+    |   AR import     |     9.73 s |   1.2 X  |
+    |   AR insert_all |     7.88 s |     1 X  |
+    | Update          |            |          |
+    |   AR one-by-one |   179.04 s |  86.9 X  |
+    |   AR import     |     3.43 s |   1.7 X  |
+    |   AR upsert_all |     2.06 s |     1 X  |
 
 ----
 
@@ -541,6 +610,17 @@ Data Pipelines in Ruby
 * insert_all/upsert_all Rails 6
 
 * worth benchmarking
+
+----
+
+Up next
+=======
+
+* census on maps
+
+* Gov Hack 20-22 Aug https://govhack.org/
+
+* Rails Camp - 10-13 Sep Adelaide
 
 Thank You
 =========
